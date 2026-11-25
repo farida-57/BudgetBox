@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:3000/api/v1
+@groupId = 000000000000000000000001
+@userId = 000000000000000000000002
+
+### Enregistrer un règlement (paiement déjà fait hors application)
+POST {{baseUrl}}/groups/{{groupId}}/settlements
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{ "fromUserId": "000000000000000000000002", "toUserId": "000000000000000000000003", "amount": 2500 }
+
+### Historique des règlements
+GET {{baseUrl}}/groups/{{groupId}}/settlements?page=1&limit=20
+X-User-Id: {{userId}}
+
+### Confirmer (à appeler avec l'identifiant du destinataire)
+POST {{baseUrl}}/groups/{{groupId}}/settlements/000000000000000000000004/confirm
+X-User-Id: 000000000000000000000003
