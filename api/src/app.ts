@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { env } from './config/environment';
 import { authRoutes } from './modules/auth/routes/auth.routes';
 import { groupRoutes, invitationRoutes } from './modules/groups/routes/group.routes';
+import { settlementRoutes } from './modules/settlements/routes/settlement.routes';
 import { userRoutes } from './modules/users/routes/user.routes';
 import { errorHandler, notFoundHandler } from './shared/errors/error-handler';
 
@@ -26,6 +27,7 @@ export function createApp() {
   const api = express.Router();
   api.use('/auth', authRoutes());
   api.use('/users', userRoutes());
+  api.use('/groups/:groupId/settlements', settlementRoutes());
   api.use('/groups', groupRoutes());
   api.use('/invitations', invitationRoutes());
   app.use('/api/v1', api);
