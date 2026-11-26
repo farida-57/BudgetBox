@@ -46,7 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final payload = await _dataSource.refresh(refreshToken);
-      return _persistAndReturn(payload);
+      return await _persistAndReturn(payload);
     } on ServerFailure catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403) {
         await _tokenStorage.clear();
