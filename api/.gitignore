@@ -2,7 +2,7 @@
 node_modules/
 
 # Build
- dist/
+dist/
 *.tsbuildinfo
 
 # Variables d'environnement et secrets — ne jamais committer
