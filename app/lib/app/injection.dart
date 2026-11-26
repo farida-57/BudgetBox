@@ -7,6 +7,11 @@ import '../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/presentation/bloc/auth_cubit.dart';
+import '../features/balances/data/datasources/balance_remote_datasource.dart';
+import '../features/balances/data/repositories/balance_repository_impl.dart';
+import '../features/balances/domain/repositories/balance_repository.dart';
+import '../features/balances/domain/usecases/get_group_balances_usecase.dart';
+import '../features/balances/domain/usecases/get_settlement_suggestions_usecase.dart';
 import '../features/groups/data/datasources/group_remote_datasource.dart';
 import '../features/groups/data/repositories/group_repository_impl.dart';
 import '../features/groups/domain/repositories/group_repository.dart';
@@ -38,6 +43,8 @@ class AppDependencies {
     required this.createInvitationUseCase,
     required this.acceptInvitationUseCase,
     required this.removeMemberUseCase,
+    required this.getGroupBalancesUseCase,
+    required this.getSettlementSuggestionsUseCase,
   });
 
   final AuthCubit authCubit;
@@ -58,6 +65,10 @@ class AppDependencies {
   final CreateInvitationUseCase createInvitationUseCase;
   final AcceptInvitationUseCase acceptInvitationUseCase;
   final RemoveMemberUseCase removeMemberUseCase;
+
+  // Balances usecases (lecture seule, calcul côté API)
+  final GetGroupBalancesUseCase getGroupBalancesUseCase;
+  final GetSettlementSuggestionsUseCase getSettlementSuggestionsUseCase;
 }
 
 AppDependencies createDependencies() {
@@ -69,6 +80,9 @@ AppDependencies createDependencies() {
 
   final GroupRemoteDataSource groupDataSource = GroupApiDataSource(apiClient.dio);
   final GroupRepository groupRepository = GroupRepositoryImpl(groupDataSource);
+
+  final BalanceRemoteDataSource balanceDataSource = BalanceApiDataSource(apiClient.dio);
+  final BalanceRepository balanceRepository = BalanceRepositoryImpl(balanceDataSource);
 
   final loginUseCase = LoginUseCase(authRepository);
   final registerUseCase = RegisterUseCase(authRepository);
@@ -83,6 +97,9 @@ AppDependencies createDependencies() {
   final createInvitationUseCase = CreateInvitationUseCase(groupRepository);
   final acceptInvitationUseCase = AcceptInvitationUseCase(groupRepository);
   final removeMemberUseCase = RemoveMemberUseCase(groupRepository);
+
+  final getGroupBalancesUseCase = GetGroupBalancesUseCase(balanceRepository);
+  final getSettlementSuggestionsUseCase = GetSettlementSuggestionsUseCase(balanceRepository);
 
   return AppDependencies(
     authCubit: AuthCubit(
@@ -108,5 +125,7 @@ AppDependencies createDependencies() {
     createInvitationUseCase: createInvitationUseCase,
     acceptInvitationUseCase: acceptInvitationUseCase,
     removeMemberUseCase: removeMemberUseCase,
+    getGroupBalancesUseCase: getGroupBalancesUseCase,
+    getSettlementSuggestionsUseCase: getSettlementSuggestionsUseCase,
   );
 }

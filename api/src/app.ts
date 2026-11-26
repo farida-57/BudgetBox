@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { env } from './config/environment';
 import { authRoutes } from './modules/auth/routes/auth.routes';
+import { balanceRoutes } from './modules/balances/routes/balance.routes';
 import { groupRoutes, invitationRoutes } from './modules/groups/routes/group.routes';
 import { userRoutes } from './modules/users/routes/user.routes';
 import { errorHandler, notFoundHandler } from './shared/errors/error-handler';
@@ -27,6 +28,8 @@ export function createApp() {
   api.use('/auth', authRoutes());
   api.use('/users', userRoutes());
   api.use('/groups', groupRoutes());
+  // Soldes et suggestions : GET /groups/:groupId/balances et /settlement-suggestions
+  api.use('/groups', balanceRoutes());
   api.use('/invitations', invitationRoutes());
   app.use('/api/v1', api);
 

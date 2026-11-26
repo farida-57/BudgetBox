@@ -4,6 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../auth/presentation/bloc/auth_cubit.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../balances/domain/usecases/get_group_balances_usecase.dart';
+import '../../../balances/domain/usecases/get_settlement_suggestions_usecase.dart';
+import '../../../balances/presentation/bloc/group_balances_cubit.dart';
+import '../../../balances/presentation/widgets/group_balances_section.dart';
 import '../../domain/entities/group_invitation.dart';
 import '../../domain/entities/group_member.dart';
 import '../../domain/usecases/create_invitation_usecase.dart';
@@ -24,14 +28,26 @@ class GroupDetailPage extends StatelessWidget {
     final authState = context.read<AuthCubit>().state;
     final currentUserId = authState is AuthAuthenticated ? authState.user.id : '';
 
-    return BlocProvider(
-      create: (_) => GroupDetailCubit(
-        groupId: groupId,
-        getGroupUseCase: context.read<GetGroupUseCase>(),
-        getGroupMembersUseCase: context.read<GetGroupMembersUseCase>(),
-        createInvitationUseCase: context.read<CreateInvitationUseCase>(),
-        removeMemberUseCase: context.read<RemoveMemberUseCase>(),
-      )..load(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => GroupDetailCubit(
+            groupId: groupId,
+            getGroupUseCase: context.read<GetGroupUseCase>(),
+            getGroupMembersUseCase: context.read<GetGroupMembersUseCase>(),
+            createInvitationUseCase: context.read<CreateInvitationUseCase>(),
+            removeMemberUseCase: context.read<RemoveMemberUseCase>(),
+          )..load(),
+        ),
+        // Soldes et suggestions : chargés en parallèle du détail, calculés par l'API.
+        BlocProvider(
+          create: (_) => GroupBalancesCubit(
+            groupId: groupId,
+            getGroupBalancesUseCase: context.read<GetGroupBalancesUseCase>(),
+            getSettlementSuggestionsUseCase: context.read<GetSettlementSuggestionsUseCase>(),
+          )..load(),
+        ),
+      ],
       child: _GroupDetailView(currentUserId: currentUserId),
     );
   }
@@ -104,6 +120,8 @@ class _GroupDetailView extends StatelessWidget {
       await context.read<GroupDetailCubit>().removeMember(member.userId);
       if (context.mounted) {
         context.read<GroupsCubit>().load();
+        // Un membre retiré peut garder un solde (affiché comme « ancien membre »).
+        context.read<GroupBalancesCubit>().load();
       }
     } catch (e) {
       if (context.mounted) {
@@ -155,6 +173,8 @@ class _GroupDetailView extends StatelessWidget {
                     title: Text('${group.currency} · ${group.memberCount} membre(s)'),
                     subtitle: Text(group.isAdmin ? 'Vous êtes administrateur' : 'Vous êtes membre'),
                   ),
+                  const Divider(height: 32),
+                  GroupBalancesSection(currentUserId: currentUserId),
                   const Divider(height: 32),
                   Text('Membres', style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 8),
