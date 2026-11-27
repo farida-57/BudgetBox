@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -18,6 +18,9 @@ import '../features/groups/domain/usecases/get_group_usecase.dart';
 import '../features/groups/domain/usecases/get_my_groups_usecase.dart';
 import '../features/groups/domain/usecases/remove_member_usecase.dart';
 import '../features/groups/presentation/bloc/groups_cubit.dart';
+import '../features/settlements/domain/usecases/confirm_settlement_usecase.dart';
+import '../features/settlements/domain/usecases/create_settlement_usecase.dart';
+import '../features/settlements/domain/usecases/get_group_activity_usecase.dart';
 import 'injection.dart';
 import 'router.dart';
 
@@ -46,6 +49,9 @@ class BudgetBoxApp extends StatelessWidget {
         RepositoryProvider<GetSettlementSuggestionsUseCase>.value(
           value: dependencies.getSettlementSuggestionsUseCase,
         ),
+        RepositoryProvider<GetGroupActivityUseCase>.value(value: dependencies.getGroupActivityUseCase),
+        RepositoryProvider<CreateSettlementUseCase>.value(value: dependencies.createSettlementUseCase),
+        RepositoryProvider<ConfirmSettlementUseCase>.value(value: dependencies.confirmSettlementUseCase),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -72,3 +78,4 @@ class BudgetBoxApp extends StatelessWidget {
     );
   }
 }
+

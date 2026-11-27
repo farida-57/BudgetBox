@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +8,8 @@ import '../../../balances/domain/usecases/get_group_balances_usecase.dart';
 import '../../../balances/domain/usecases/get_settlement_suggestions_usecase.dart';
 import '../../../balances/presentation/bloc/group_balances_cubit.dart';
 import '../../../balances/presentation/widgets/group_balances_section.dart';
+import '../../../balances/domain/entities/settlement_suggestion.dart';
+import '../../../settlements/presentation/pages/settlement_history_page.dart';
 import '../../domain/entities/group_invitation.dart';
 import '../../domain/entities/group_member.dart';
 import '../../domain/usecases/create_invitation_usecase.dart';
@@ -131,6 +133,12 @@ class _GroupDetailView extends StatelessWidget {
     }
   }
 
+  void _openSettlements(BuildContext context, {required String groupId, required List<GroupMember> members, SettlementSuggestion? suggestion}) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SettlementHistoryPage(
+      groupId: groupId, currentUserId: currentUserId, members: members, initialSuggestion: suggestion,
+      onBalancesChanged: () => context.read<GroupBalancesCubit>().load(),
+    )));
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupDetailCubit, GroupDetailState>(
@@ -174,7 +182,12 @@ class _GroupDetailView extends StatelessWidget {
                     subtitle: Text(group.isAdmin ? 'Vous êtes administrateur' : 'Vous êtes membre'),
                   ),
                   const Divider(height: 32),
-                  GroupBalancesSection(currentUserId: currentUserId),
+                  GroupBalancesSection(currentUserId: currentUserId, onSuggestionSelected: (suggestion) =>
+                    _openSettlements(context, groupId: group.id, members: members, suggestion: suggestion)),
+                  OutlinedButton.icon(
+                    onPressed: () => _openSettlements(context, groupId: group.id, members: members),
+                    icon: const Icon(Icons.history), label: const Text('Historique et règlements'),
+                  ),
                   const Divider(height: 32),
                   Text('Membres', style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 8),
@@ -219,3 +232,4 @@ class _GroupDetailView extends StatelessWidget {
     );
   }
 }
+

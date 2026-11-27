@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/format/xof_format.dart';
@@ -12,9 +12,10 @@ import '../bloc/group_balances_state.dart';
 ///
 /// Affiche uniquement les valeurs reçues de l'API ; aucun calcul ici.
 class GroupBalancesSection extends StatelessWidget {
-  const GroupBalancesSection({super.key, required this.currentUserId});
+  const GroupBalancesSection({super.key, required this.currentUserId, this.onSuggestionSelected});
 
   final String currentUserId;
+  final ValueChanged<SettlementSuggestion>? onSuggestionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +55,7 @@ class GroupBalancesSection extends StatelessWidget {
                   balances: balances,
                   suggestions: suggestions,
                   currentUserId: currentUserId,
+                  onSuggestionSelected: onSuggestionSelected,
                 ),
             },
           ],
@@ -105,11 +107,13 @@ class _BalancesContent extends StatelessWidget {
     required this.balances,
     required this.suggestions,
     required this.currentUserId,
+    this.onSuggestionSelected,
   });
 
   final GroupBalances balances;
   final List<SettlementSuggestion> suggestions;
   final String currentUserId;
+  final ValueChanged<SettlementSuggestion>? onSuggestionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +163,7 @@ class _BalancesContent extends StatelessWidget {
                 '${suggestion.fromDisplayName} → ${suggestion.toDisplayName}',
               ),
               trailing: Text(formatXof(suggestion.amount, currency: currency)),
+              onTap: onSuggestionSelected == null ? null : () => onSuggestionSelected!(suggestion),
             ),
           ),
       ],
@@ -219,3 +224,4 @@ class _MemberBalanceTile extends StatelessWidget {
     );
   }
 }
+

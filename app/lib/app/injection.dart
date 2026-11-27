@@ -1,4 +1,4 @@
-import '../features/auth/domain/usecases/login_usecase.dart';
+﻿import '../features/auth/domain/usecases/login_usecase.dart';
 import '../features/auth/domain/usecases/logout_usecase.dart';
 import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/domain/usecases/restore_session_usecase.dart';
@@ -23,6 +23,12 @@ import '../features/groups/domain/usecases/get_group_usecase.dart';
 import '../features/groups/domain/usecases/get_my_groups_usecase.dart';
 import '../features/groups/domain/usecases/remove_member_usecase.dart';
 import '../features/groups/presentation/bloc/groups_cubit.dart';
+import '../features/settlements/data/datasources/settlement_remote_data_source.dart';
+import '../features/settlements/data/repositories/settlement_repository_impl.dart';
+import '../features/settlements/domain/repositories/settlement_repository.dart';
+import '../features/settlements/domain/usecases/confirm_settlement_usecase.dart';
+import '../features/settlements/domain/usecases/create_settlement_usecase.dart';
+import '../features/settlements/domain/usecases/get_group_activity_usecase.dart';
 import '../core/network/api_client.dart';
 import '../core/storage/token_storage.dart';
 
@@ -45,6 +51,9 @@ class AppDependencies {
     required this.removeMemberUseCase,
     required this.getGroupBalancesUseCase,
     required this.getSettlementSuggestionsUseCase,
+    required this.getGroupActivityUseCase,
+    required this.createSettlementUseCase,
+    required this.confirmSettlementUseCase,
   });
 
   final AuthCubit authCubit;
@@ -69,6 +78,9 @@ class AppDependencies {
   // Balances usecases (lecture seule, calcul côté API)
   final GetGroupBalancesUseCase getGroupBalancesUseCase;
   final GetSettlementSuggestionsUseCase getSettlementSuggestionsUseCase;
+  final GetGroupActivityUseCase getGroupActivityUseCase;
+  final CreateSettlementUseCase createSettlementUseCase;
+  final ConfirmSettlementUseCase confirmSettlementUseCase;
 }
 
 AppDependencies createDependencies() {
@@ -83,6 +95,9 @@ AppDependencies createDependencies() {
 
   final BalanceRemoteDataSource balanceDataSource = BalanceApiDataSource(apiClient.dio);
   final BalanceRepository balanceRepository = BalanceRepositoryImpl(balanceDataSource);
+
+  final SettlementRemoteDataSource settlementDataSource = SettlementApiDataSource(apiClient.dio);
+  final SettlementRepository settlementRepository = SettlementRepositoryImpl(settlementDataSource);
 
   final loginUseCase = LoginUseCase(authRepository);
   final registerUseCase = RegisterUseCase(authRepository);
@@ -100,6 +115,9 @@ AppDependencies createDependencies() {
 
   final getGroupBalancesUseCase = GetGroupBalancesUseCase(balanceRepository);
   final getSettlementSuggestionsUseCase = GetSettlementSuggestionsUseCase(balanceRepository);
+  final getGroupActivityUseCase = GetGroupActivityUseCase(settlementRepository);
+  final createSettlementUseCase = CreateSettlementUseCase(settlementRepository);
+  final confirmSettlementUseCase = ConfirmSettlementUseCase(settlementRepository);
 
   return AppDependencies(
     authCubit: AuthCubit(
@@ -127,5 +145,9 @@ AppDependencies createDependencies() {
     removeMemberUseCase: removeMemberUseCase,
     getGroupBalancesUseCase: getGroupBalancesUseCase,
     getSettlementSuggestionsUseCase: getSettlementSuggestionsUseCase,
+    getGroupActivityUseCase: getGroupActivityUseCase,
+    createSettlementUseCase: createSettlementUseCase,
+    confirmSettlementUseCase: confirmSettlementUseCase,
   );
 }
+
