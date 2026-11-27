@@ -209,3 +209,73 @@ describe('Dépenses — accès', () => {
     expect(res.status).toBe(403);
   });
 });
+describe('Dépenses — liste', () => {
+  const category = 'liste-test';
+
+  beforeAll(async () => {
+    const { awa, groupId } = await setupGroup();
+    for (const [label, date] of [
+      ['A', '2026-11-01'],
+      ['B', '2026-11-02'],
+      ['C', '2026-11-03'],
+    ]) {
+      await post(groupId, awa.accessToken, {
+        label,
+        category,
+        amount: 1000,
+        payerId: awa.user.id,
+        date,
+        split: { type: 'equal', participantIds: [awa.user.id] },
+      });
+    }
+  });
+
+  const get = (groupId: string, token: string, qs: string) =>
+    api.get(`/api/v1/groups/${groupId}/expenses?${qs}`).set(authHeader(token));
+
+  it('liste du plus récent au plus ancien (200)', async () => {
+    const { awa, groupId } = await setupGroup();
+    const res = await get(groupId, awa.accessToken, `category=${category}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(3);
+    expect(res.body.items.map((e: { label: string }) => e.label)).toEqual(['C', 'B', 'A']);
+  });
+
+  it('pagine les résultats', async () => {
+    const { awa, groupId } = await setupGroup();
+    const res = await get(groupId, awa.accessToken, `category=${category}&limit=2&page=2`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.page).toBe(2);
+  });
+
+  it('filtre par période', async () => {
+    const { awa, groupId } = await setupGroup();
+    const res = await get(groupId, awa.accessToken, `category=${category}&from=2026-11-02&to=2026-11-03`);
+
+    expect(res.body.total).toBe(2);
+  });
+
+  it('refuse une limite supérieure à 50 (422)', async () => {
+    const { awa, groupId } = await setupGroup();
+    const res = await get(groupId, awa.accessToken, 'limit=100');
+
+    expect(res.status).toBe(422);
+  });
+
+  it('un membre ordinaire peut lire la liste (200)', async () => {
+    const { binta, groupId } = await setupGroup();
+    const res = await get(groupId, binta.accessToken, `category=${category}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  it('refuse sans authentification (401)', async () => {
+    const { groupId } = await setupGroup();
+    const res = await api.get(`/api/v1/groups/${groupId}/expenses`);
+
+    expect(res.status).toBe(401);
+  });
+});

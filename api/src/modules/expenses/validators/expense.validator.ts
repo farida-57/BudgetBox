@@ -42,3 +42,20 @@ export const createExpenseSchema = z
   .strict();
 
 export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;
+export const listExpensesQuerySchema = z
+  .object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    category: z.string().trim().min(1).max(40).optional(),
+    payerId: objectId.optional(),
+    memberId: objectId.optional(),
+    from: z.coerce.date().optional(),
+    to: z.coerce.date().optional(),
+  })
+  .strict()
+  .refine((q) => !q.from || !q.to || q.from <= q.to, {
+    message: 'La date de début doit précéder la date de fin',
+    path: ['from'],
+  });
+
+export type ListExpensesQuery = z.infer<typeof listExpensesQuerySchema>;
