@@ -3,7 +3,7 @@ import { forbidden, notFound, unprocessable } from '../../../shared/errors/app-e
 import { Group, type GroupDocument } from '../../groups/models/group.model';
 import { User } from '../../users/models/user.model';
 import { Expense } from '../models/expense.model';
-import type { CreateExpenseInput } from '../validators/expense.validator';
+import type { CreateExpenseInput, ListExpensesQuery } from '../validators/expense.validator';
 
 interface Share {
   userId: string;
@@ -125,5 +125,35 @@ export class ExpenseService {
     });
 
     return toExpense(expense);
+  }
+
+  async listExpenses(groupId: string, userId: string, query: ListExpensesQuery) {
+    const group = await findGroupOr404(groupId);
+    if (!memberIdsOf(group).includes(userId)) {
+      throw forbidden("Vous n'êtes pas membre de ce groupe");
+    }
+
+    const filter: Record<string, unknown> = { groupId };
+    if (query.category) filter.category = query.category;
+    if (query.payerId) filter.payerId = query.payerId;
+    if (query.memberId) {
+      filter.$or = [{ payerId: query.memberId }, { 'shares.userId': query.memberId }];
+    }
+    if (query.from || query.to) {
+      filter.date = {
+        ...(query.from ? { $gte: query.from } : {}),
+        ...(query.to ? { $lte: query.to } : {}),
+      };
+    }
+
+    const [docs, total] = await Promise.all([
+      Expense.find(filter)
+        .sort({ date: -1, _id: -1 })
+        .skip((query.page - 1) * query.limit)
+        .limit(query.limit),
+      Expense.countDocuments(filter),
+    ]);
+
+    return { items: docs.map(toExpense), page: query.page, limit: query.limit, total };
   }
 }
