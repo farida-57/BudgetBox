@@ -1,0 +1,23 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Variables d'environnement et secrets — ne jamais committer
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Tests / couverture
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
