@@ -17,7 +17,9 @@ const _categories = [
 ];
 
 class CreateExpensePage extends StatefulWidget {
-  const CreateExpensePage({super.key});
+  const CreateExpensePage({super.key, this.onExpenseCreated});
+
+  final VoidCallback? onExpenseCreated;
 
   @override
   State<CreateExpensePage> createState() => _CreateExpensePageState();
@@ -78,8 +80,9 @@ class _CreateExpensePageState extends State<CreateExpensePage> {
               ).showSnackBar(const SnackBar(content: Text('Dépense ajoutée')));
               context.pop();
             } else if (state.message != null) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message!)));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message!)));
             }
           },
           builder: (context, state) {

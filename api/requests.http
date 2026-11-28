@@ -3,6 +3,9 @@
 @refreshToken =
 @groupId =
 @inviteToken =
+@userId =
+@recipientId =
+@settlementId =
 
 ### === Auth ===
 
@@ -86,4 +89,48 @@ Authorization: Bearer {{accessToken}}
 # 200 → { "groupId", "currency": "XOF",
 #         "suggestions": [{ "fromUserId", "fromDisplayName", "toUserId", "toDisplayName", "amount": 3333 }] }
 GET {{baseUrl}}/groups/{{groupId}}/settlement-suggestions
+Authorization: Bearer {{accessToken}}
+
+### === Dépenses ===
+
+### Créer une dépense avec partage égal (admin du groupe)
+POST {{baseUrl}}/groups/{{groupId}}/expenses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "label": "Courses",
+  "amount": 12500,
+  "payerId": "{{userId}}",
+  "category": "alimentation",
+  "date": "2026-11-27T12:00:00.000Z",
+  "split": {
+    "type": "equal",
+    "participantIds": ["{{userId}}"]
+  }
+}
+
+### Lister les dépenses (membre), pagination et filtres facultatifs
+GET {{baseUrl}}/groups/{{groupId}}/expenses?page=1&limit=20
+Authorization: Bearer {{accessToken}}
+
+### === Historique et règlements ===
+
+### Historique combiné dépenses/règlements (membre)
+GET {{baseUrl}}/groups/{{groupId}}/activity?page=1&limit=20&type=expense
+Authorization: Bearer {{accessToken}}
+
+### Enregistrer un règlement déjà payé hors application
+POST {{baseUrl}}/groups/{{groupId}}/settlements
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fromUserId": "{{userId}}",
+  "toUserId": "{{recipientId}}",
+  "amount": 5000
+}
+
+### Confirmer le règlement (destinataire seulement)
+POST {{baseUrl}}/groups/{{groupId}}/settlements/{{settlementId}}/confirm
 Authorization: Bearer {{accessToken}}

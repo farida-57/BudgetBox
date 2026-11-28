@@ -69,8 +69,12 @@ class ExpenseFormCubit extends Cubit<ExpenseFormState> {
 
     if (label.trim().isEmpty) errors['label'] = 'Libellé requis';
     if (category.trim().isEmpty) errors['category'] = 'Catégorie requise';
-    if (amount == null || amount <= 0) errors['amount'] = 'Entrez un montant entier positif';
-    if (state.payerId == null) errors['payerId'] = 'Payeur requis';
+    if (amount == null || amount <= 0) {
+      errors['amount'] = 'Entrez un montant entier positif';
+    }
+    if (state.payerId == null) {
+      errors['payerId'] = 'Payeur requis';
+    }
 
     final shares = {...state.customAmounts}..removeWhere((_, v) => v <= 0);
     if (state.isCustom) {

@@ -21,6 +21,7 @@ import '../features/groups/presentation/bloc/groups_cubit.dart';
 import '../features/settlements/domain/usecases/confirm_settlement_usecase.dart';
 import '../features/settlements/domain/usecases/create_settlement_usecase.dart';
 import '../features/settlements/domain/usecases/get_group_activity_usecase.dart';
+import '../features/expenses/domain/usecases/create_expense_usecase.dart';
 import 'injection.dart';
 import 'router.dart';
 
@@ -52,6 +53,7 @@ class BudgetBoxApp extends StatelessWidget {
         RepositoryProvider<GetGroupActivityUseCase>.value(value: dependencies.getGroupActivityUseCase),
         RepositoryProvider<CreateSettlementUseCase>.value(value: dependencies.createSettlementUseCase),
         RepositoryProvider<ConfirmSettlementUseCase>.value(value: dependencies.confirmSettlementUseCase),
+        RepositoryProvider<CreateExpenseUseCase>.value(value: dependencies.createExpenseUseCase),
       ],
       child: MultiBlocProvider(
         providers: [

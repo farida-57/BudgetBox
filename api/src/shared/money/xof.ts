@@ -72,13 +72,13 @@ export function sumXof(values: readonly number[]): number {
  * `z.number()` refuse les chaînes ("1000") : aucune conversion implicite.
  */
 export const xofAmountSchema = z
-  .number({ invalid_type_error: 'Le montant doit être un nombre entier' })
+  .number({ error: 'Le montant doit être un nombre entier' })
   .int('Le montant doit être un entier (XOF sans décimales)')
   .positive('Le montant doit être strictement positif')
   .max(MAX_XOF_AMOUNT, 'Montant hors de la limite autorisée');
 
 export const xofShareSchema = z
-  .number({ invalid_type_error: 'La part doit être un nombre entier' })
+  .number({ error: 'La part doit être un nombre entier' })
   .int('La part doit être un entier (XOF sans décimales)')
   .nonnegative('La part ne peut pas être négative')
   .max(MAX_XOF_AMOUNT, 'Part hors de la limite autorisée');

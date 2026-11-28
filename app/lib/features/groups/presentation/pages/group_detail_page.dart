@@ -19,6 +19,9 @@ import '../../domain/usecases/remove_member_usecase.dart';
 import '../bloc/group_detail_cubit.dart';
 import '../bloc/group_detail_state.dart';
 import '../bloc/groups_cubit.dart';
+import '../../../expenses/domain/usecases/create_expense_usecase.dart';
+import '../../../expenses/presentation/bloc/expense_form_cubit.dart';
+import '../../../expenses/presentation/pages/create_expense_page.dart';
 
 class GroupDetailPage extends StatelessWidget {
   const GroupDetailPage({super.key, required this.groupId});
@@ -184,6 +187,27 @@ class _GroupDetailView extends StatelessWidget {
                   const Divider(height: 32),
                   GroupBalancesSection(currentUserId: currentUserId, onSuggestionSelected: (suggestion) =>
                     _openSettlements(context, groupId: group.id, members: members, suggestion: suggestion)),
+                  if (group.isAdmin)
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        final getMembers = context.read<GetGroupMembersUseCase>();
+                        final createExpense = context.read<CreateExpenseUseCase>();
+                        Navigator.of(context).push<void>(MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) => ExpenseFormCubit(
+                              groupId: group.id,
+                              getMembersUseCase: getMembers,
+                              createExpenseUseCase: createExpense,
+                            )..load(),
+                            child: CreateExpensePage(
+                              onExpenseCreated: () => context.read<GroupBalancesCubit>().load(),
+                            ),
+                          ),
+                        ));
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Ajouter une dépense'),
+                    ),
                   OutlinedButton.icon(
                     onPressed: () => _openSettlements(context, groupId: group.id, members: members),
                     icon: const Icon(Icons.history), label: const Text('Historique et règlements'),

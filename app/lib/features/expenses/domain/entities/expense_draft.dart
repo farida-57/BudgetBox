@@ -27,6 +27,14 @@ class ExpenseDraft extends Equatable {
   final Map<String, int>? customShares;
 
   @override
-  List<Object?> get props =>
-      [label, amount, payerId, category, date, note, participantIds, customShares];
+  List<Object?> get props => [
+    label,
+    amount,
+    payerId,
+    category,
+    date,
+    note,
+    participantIds,
+    customShares,
+  ];
 }

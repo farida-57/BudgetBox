@@ -11,11 +11,11 @@ class ExpenseModel extends Expense {
   });
 
   factory ExpenseModel.fromJson(Map<String, dynamic> json) => ExpenseModel(
-        id: json['id'] as String,
-        label: json['label'] as String,
-        amount: (json['amount'] as num).toInt(),
-        payerId: json['payerId'] as String,
-        category: json['category'] as String,
-        date: DateTime.parse(json['date'] as String),
-      );
+    id: json['id'] as String,
+    label: json['label'] as String,
+    amount: (json['amount'] as num).toInt(),
+    payerId: json['payerId'] as String,
+    category: json['category'] as String,
+    date: DateTime.parse(json['date'] as String),
+  );
 }

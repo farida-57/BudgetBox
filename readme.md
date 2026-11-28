@@ -334,3 +334,21 @@ curl -X POST http://localhost:3000/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"displayName":"Test","email":"test@example.com","password":"motdepasse123"}'
 ```
+
+## 11. Démarrer sur Edge et parcours dépenses
+
+Pour lancer l'application Flutter dans Microsoft Edge, démarrez d'abord l'API (et MongoDB), puis exécutez dans un deuxième terminal :
+
+```powershell
+cd app
+flutter pub get
+flutter run -d edge
+```
+
+Le navigateur utilise `http://localhost:3000/api/v1` par défaut. Pour une API hébergée ailleurs, passez `--dart-define=BUDGETBOX_API_URL=https://adresse-api/api/v1` et autorisez l'origine web dans `CORS_ORIGIN`. Android Emulator utilise par défaut `http://10.0.2.2:3000/api/v1`.
+
+Les administrateurs de groupe peuvent ouvrir **Ajouter une dépense** depuis le détail du groupe. Le formulaire prend en charge le partage égal et les parts personnalisées; les dépenses apparaissent ensuite dans l'historique du groupe.
+
+La réponse au questionnaire (Q20) est « Non » à la question de savoir si tous les membres peuvent créer dépenses et règlements. L'API limite provisoirement la création des dépenses aux administrateurs et l'application n'affiche le formulaire qu'à eux. Le PRD initial proposait au contraire de laisser tout membre ajouter une dépense : l'équipe doit confirmer quelle interprétation retenir avant la démonstration.
+
+Les vérifications locales et GitHub Actions utilisent `npm ci`, `npm test`, `npm run typecheck`, `npm run build`, `flutter analyze --no-fatal-infos` et `flutter test`.

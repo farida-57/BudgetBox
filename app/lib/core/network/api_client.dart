@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../error/failure.dart';
 import '../storage/token_storage.dart';
@@ -20,7 +21,9 @@ class ApiClient {
                 baseUrl: baseUrl ??
                     const String.fromEnvironment(
                       'BUDGETBOX_API_URL',
-                      defaultValue: 'http://10.0.2.2:3000/api/v1',
+                      defaultValue: kIsWeb
+                          ? 'http://localhost:3000/api/v1'
+                          : 'http://10.0.2.2:3000/api/v1',
                     ),
                 connectTimeout: const Duration(seconds: 10),
                 receiveTimeout: const Duration(seconds: 15),

@@ -45,7 +45,7 @@ GoRouter buildRouter(AuthCubit authCubit) {
         return isSplash ? null : '/splash';
       }
       if (authState is AuthUnauthenticated) {
-        return isAuthPage || isSplash ? null : '/login';
+        return isAuthPage ? null : '/login';
       }
       if (authState is AuthAuthenticated) {
         if (isAuthPage || isSplash) return '/groups';

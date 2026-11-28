@@ -23,6 +23,10 @@ import '../features/groups/domain/usecases/get_group_usecase.dart';
 import '../features/groups/domain/usecases/get_my_groups_usecase.dart';
 import '../features/groups/domain/usecases/remove_member_usecase.dart';
 import '../features/groups/presentation/bloc/groups_cubit.dart';
+import '../features/expenses/data/datasources/expense_remote_datasource.dart';
+import '../features/expenses/data/repositories/expense_repository_impl.dart';
+import '../features/expenses/domain/repositories/expense_repository.dart';
+import '../features/expenses/domain/usecases/create_expense_usecase.dart';
 import '../features/settlements/data/datasources/settlement_remote_data_source.dart';
 import '../features/settlements/data/repositories/settlement_repository_impl.dart';
 import '../features/settlements/domain/repositories/settlement_repository.dart';
@@ -54,6 +58,7 @@ class AppDependencies {
     required this.getGroupActivityUseCase,
     required this.createSettlementUseCase,
     required this.confirmSettlementUseCase,
+    required this.createExpenseUseCase,
   });
 
   final AuthCubit authCubit;
@@ -81,6 +86,7 @@ class AppDependencies {
   final GetGroupActivityUseCase getGroupActivityUseCase;
   final CreateSettlementUseCase createSettlementUseCase;
   final ConfirmSettlementUseCase confirmSettlementUseCase;
+  final CreateExpenseUseCase createExpenseUseCase;
 }
 
 AppDependencies createDependencies() {
@@ -98,6 +104,9 @@ AppDependencies createDependencies() {
 
   final SettlementRemoteDataSource settlementDataSource = SettlementApiDataSource(apiClient.dio);
   final SettlementRepository settlementRepository = SettlementRepositoryImpl(settlementDataSource);
+
+  final ExpenseRemoteDataSource expenseDataSource = ExpenseApiDataSource(apiClient.dio);
+  final ExpenseRepository expenseRepository = ExpenseRepositoryImpl(expenseDataSource);
 
   final loginUseCase = LoginUseCase(authRepository);
   final registerUseCase = RegisterUseCase(authRepository);
@@ -118,6 +127,7 @@ AppDependencies createDependencies() {
   final getGroupActivityUseCase = GetGroupActivityUseCase(settlementRepository);
   final createSettlementUseCase = CreateSettlementUseCase(settlementRepository);
   final confirmSettlementUseCase = ConfirmSettlementUseCase(settlementRepository);
+  final createExpenseUseCase = CreateExpenseUseCase(expenseRepository);
 
   return AppDependencies(
     authCubit: AuthCubit(
@@ -148,6 +158,7 @@ AppDependencies createDependencies() {
     getGroupActivityUseCase: getGroupActivityUseCase,
     createSettlementUseCase: createSettlementUseCase,
     confirmSettlementUseCase: confirmSettlementUseCase,
+    createExpenseUseCase: createExpenseUseCase,
   );
 }
 
