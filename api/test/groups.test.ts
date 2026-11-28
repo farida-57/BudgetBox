@@ -115,6 +115,61 @@ describe('Invitations — usage unique', () => {
   });
 });
 
+describe('Membres — ajout direct par l\'admin', () => {
+  it('ajoute un membre par courriel (201) puis le membre accède au groupe', async () => {
+    const admin = await registerUser();
+    const member = await registerUser();
+    const group = await createGroup(admin.accessToken);
+    const groupId = group.body.id;
+
+    const res = await api
+      .post(`/api/v1/groups/${groupId}/members`)
+      .set(authHeader(admin.accessToken))
+      .send({ email: member.user.email });
+    expect(res.status).toBe(201);
+    expect(res.body.role).toBe('membre');
+    expect(res.body.email).toBe(member.user.email);
+
+    const detail = await api.get(`/api/v1/groups/${groupId}`).set(authHeader(member.accessToken));
+    expect(detail.status).toBe(200);
+  });
+
+  it('refuse l\'ajout par un non-admin (403)', async () => {
+    const admin = await registerUser();
+    const member = await registerUser();
+    const other = await registerUser();
+    const group = await createGroup(admin.accessToken);
+    const groupId = group.body.id;
+    await api.post(`/api/v1/groups/${groupId}/members`).set(authHeader(admin.accessToken)).send({ email: member.user.email });
+
+    const res = await api
+      .post(`/api/v1/groups/${groupId}/members`)
+      .set(authHeader(member.accessToken))
+      .send({ email: other.user.email });
+    expect(res.status).toBe(403);
+  });
+
+  it('renvoie 404 pour un courriel inconnu et 409 si déjà membre', async () => {
+    const admin = await registerUser();
+    const member = await registerUser();
+    const group = await createGroup(admin.accessToken);
+    const groupId = group.body.id;
+
+    const unknown = await api
+      .post(`/api/v1/groups/${groupId}/members`)
+      .set(authHeader(admin.accessToken))
+      .send({ email: 'inconnu@example.com' });
+    expect(unknown.status).toBe(404);
+
+    await api.post(`/api/v1/groups/${groupId}/members`).set(authHeader(admin.accessToken)).send({ email: member.user.email });
+    const again = await api
+      .post(`/api/v1/groups/${groupId}/members`)
+      .set(authHeader(admin.accessToken))
+      .send({ email: member.user.email });
+    expect(again.status).toBe(409);
+  });
+});
+
 describe('Membres — retrait', () => {
   it('liste les membres avec leurs rôles', async () => {
     const admin = await registerUser({ displayName: 'Admin' });

@@ -16,6 +16,7 @@ import '../features/groups/data/datasources/group_remote_datasource.dart';
 import '../features/groups/data/repositories/group_repository_impl.dart';
 import '../features/groups/domain/repositories/group_repository.dart';
 import '../features/groups/domain/usecases/accept_invitation_usecase.dart';
+import '../features/groups/domain/usecases/add_member_usecase.dart';
 import '../features/groups/domain/usecases/create_group_usecase.dart';
 import '../features/groups/domain/usecases/create_invitation_usecase.dart';
 import '../features/groups/domain/usecases/get_group_members_usecase.dart';
@@ -48,6 +49,7 @@ class AppDependencies {
     required this.getGroupMembersUseCase,
     required this.createInvitationUseCase,
     required this.acceptInvitationUseCase,
+    required this.addMemberUseCase,
     required this.removeMemberUseCase,
     required this.getGroupBalancesUseCase,
     required this.getSettlementSuggestionsUseCase,
@@ -73,6 +75,7 @@ class AppDependencies {
   final GetGroupMembersUseCase getGroupMembersUseCase;
   final CreateInvitationUseCase createInvitationUseCase;
   final AcceptInvitationUseCase acceptInvitationUseCase;
+  final AddMemberUseCase addMemberUseCase;
   final RemoveMemberUseCase removeMemberUseCase;
 
   // Balances usecases (lecture seule, calcul côté API)
@@ -111,6 +114,7 @@ AppDependencies createDependencies() {
   final getGroupMembersUseCase = GetGroupMembersUseCase(groupRepository);
   final createInvitationUseCase = CreateInvitationUseCase(groupRepository);
   final acceptInvitationUseCase = AcceptInvitationUseCase(groupRepository);
+  final addMemberUseCase = AddMemberUseCase(groupRepository);
   final removeMemberUseCase = RemoveMemberUseCase(groupRepository);
 
   final getGroupBalancesUseCase = GetGroupBalancesUseCase(balanceRepository);
@@ -142,6 +146,7 @@ AppDependencies createDependencies() {
     getGroupMembersUseCase: getGroupMembersUseCase,
     createInvitationUseCase: createInvitationUseCase,
     acceptInvitationUseCase: acceptInvitationUseCase,
+    addMemberUseCase: addMemberUseCase,
     removeMemberUseCase: removeMemberUseCase,
     getGroupBalancesUseCase: getGroupBalancesUseCase,
     getSettlementSuggestionsUseCase: getSettlementSuggestionsUseCase,

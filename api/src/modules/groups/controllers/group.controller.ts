@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { GroupService } from '../services/group.service';
 import type {
+  AddMemberInput,
   CreateGroupInput,
   UpdateGroupInput,
 } from '../validators/group.validator';
@@ -69,6 +70,16 @@ export class GroupController {
       const { groupId, userId } = params<{ groupId: string; userId: string }>(req);
       await groupService.removeMember(groupId, req.user!.id, userId);
       res.status(204).end();
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async addMember(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { groupId } = params<{ groupId: string }>(req);
+      const member = await groupService.addMember(groupId, req.user!.id, body<AddMemberInput>(req));
+      res.status(201).json(member);
     } catch (err) {
       next(err);
     }

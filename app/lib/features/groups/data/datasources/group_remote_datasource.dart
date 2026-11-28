@@ -13,6 +13,7 @@ abstract class GroupRemoteDataSource {
   Future<List<GroupMemberModel>> getMembers(String groupId);
   Future<GroupInvitationModel> createInvitation(String groupId);
   Future<GroupModel> acceptInvitation(String token);
+  Future<GroupMemberModel> addMember(String groupId, String email);
   Future<void> removeMember(String groupId, String userId);
 }
 
@@ -83,6 +84,19 @@ class GroupApiDataSource implements GroupRemoteDataSource {
     try {
       final res = await _dio.post<Map<String, dynamic>>('/invitations/$token/accept');
       return GroupModel.fromJson(res.data!);
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
+  @override
+  Future<GroupMemberModel> addMember(String groupId, String email) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>(
+        '/groups/$groupId/members',
+        data: {'email': email},
+      );
+      return GroupMemberModel.fromJson(res.data!);
     } on DioException catch (e) {
       throw mapDioException(e);
     }

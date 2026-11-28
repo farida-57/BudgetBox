@@ -12,6 +12,7 @@ import '../../../balances/domain/entities/settlement_suggestion.dart';
 import '../../../settlements/presentation/pages/settlement_history_page.dart';
 import '../../domain/entities/group_invitation.dart';
 import '../../domain/entities/group_member.dart';
+import '../../domain/usecases/add_member_usecase.dart';
 import '../../domain/usecases/create_invitation_usecase.dart';
 import '../../domain/usecases/get_group_members_usecase.dart';
 import '../../domain/usecases/get_group_usecase.dart';
@@ -38,6 +39,7 @@ class GroupDetailPage extends StatelessWidget {
             getGroupUseCase: context.read<GetGroupUseCase>(),
             getGroupMembersUseCase: context.read<GetGroupMembersUseCase>(),
             createInvitationUseCase: context.read<CreateInvitationUseCase>(),
+            addMemberUseCase: context.read<AddMemberUseCase>(),
             removeMemberUseCase: context.read<RemoveMemberUseCase>(),
           )..load(),
         ),
@@ -66,6 +68,47 @@ class _GroupDetailView extends StatelessWidget {
       final invitation = await cubit.invite();
       if (!context.mounted) return;
       _showInvitationDialog(context, invitation);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    }
+  }
+
+  Future<void> _addMember(BuildContext context) async {
+    final controller = TextEditingController();
+    final email = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ajouter un membre'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            labelText: 'Courriel',
+            hintText: 'membre@exemple.com',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Annuler')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
+    if (email == null || email.isEmpty || !context.mounted) return;
+
+    try {
+      await context.read<GroupDetailCubit>().addMember(email);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Membre ajouté')),
+        );
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
@@ -213,6 +256,12 @@ class _GroupDetailView extends StatelessWidget {
                   ),
                   if (group.isAdmin) ...[
                     const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: () => _addMember(context),
+                      icon: const Icon(Icons.person_add),
+                      label: const Text('Ajouter un membre'),
+                    ),
+                    const SizedBox(height: 8),
                     OutlinedButton.icon(
                       onPressed: () => _invite(context),
                       icon: const Icon(Icons.link),

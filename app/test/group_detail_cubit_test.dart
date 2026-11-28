@@ -3,6 +3,7 @@ import 'package:budgetbox/core/error/failure.dart';
 import 'package:budgetbox/features/groups/domain/entities/group.dart';
 import 'package:budgetbox/features/groups/domain/entities/group_invitation.dart';
 import 'package:budgetbox/features/groups/domain/entities/group_member.dart';
+import 'package:budgetbox/features/groups/domain/usecases/add_member_usecase.dart';
 import 'package:budgetbox/features/groups/domain/usecases/create_invitation_usecase.dart';
 import 'package:budgetbox/features/groups/domain/usecases/get_group_members_usecase.dart';
 import 'package:budgetbox/features/groups/domain/usecases/get_group_usecase.dart';
@@ -18,6 +19,8 @@ class MockGetGroupMembersUseCase extends Mock implements GetGroupMembersUseCase 
 
 class MockCreateInvitationUseCase extends Mock implements CreateInvitationUseCase {}
 
+class MockAddMemberUseCase extends Mock implements AddMemberUseCase {}
+
 class MockRemoveMemberUseCase extends Mock implements RemoveMemberUseCase {}
 
 const _group = Group(id: 'g1', name: 'Coloc', currency: 'XOF', role: GroupRole.admin);
@@ -32,6 +35,7 @@ GroupDetailCubit buildCubit({
   MockGetGroupUseCase? getGroup,
   MockGetGroupMembersUseCase? getMembers,
   MockCreateInvitationUseCase? createInvitation,
+  MockAddMemberUseCase? addMember,
   MockRemoveMemberUseCase? removeMember,
 }) {
   return GroupDetailCubit(
@@ -39,6 +43,7 @@ GroupDetailCubit buildCubit({
     getGroupUseCase: getGroup ?? MockGetGroupUseCase(),
     getGroupMembersUseCase: getMembers ?? MockGetGroupMembersUseCase(),
     createInvitationUseCase: createInvitation ?? MockCreateInvitationUseCase(),
+    addMemberUseCase: addMember ?? MockAddMemberUseCase(),
     removeMemberUseCase: removeMember ?? MockRemoveMemberUseCase(),
   );
 }
@@ -84,6 +89,28 @@ void main() {
 
       final result = await cubit.invite();
       expect(result.token, 'tok123');
+    });
+  });
+
+  group('GroupDetailCubit.addMember', () {
+    test('ajoute le membre par courriel et recharge le détail', () async {
+      final getGroup = MockGetGroupUseCase();
+      final getMembers = MockGetGroupMembersUseCase();
+      final addMember = MockAddMemberUseCase();
+      when(() => addMember('g1', 'binta@test.com')).thenAnswer((_) async => _member);
+      when(() => getGroup('g1')).thenAnswer((_) async => _group);
+      when(() => getMembers('g1')).thenAnswer((_) async => [_member]);
+      final cubit = buildCubit(
+        getGroup: getGroup,
+        getMembers: getMembers,
+        addMember: addMember,
+      );
+
+      final result = await cubit.addMember('binta@test.com');
+
+      expect(result.userId, 'u2');
+      verify(() => addMember('g1', 'binta@test.com')).called(1);
+      expect(cubit.state, const GroupDetailLoaded(group: _group, members: [_member]));
     });
   });
 

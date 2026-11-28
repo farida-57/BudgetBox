@@ -21,5 +21,12 @@ export const updateGroupSchema = z
   })
   .strict();
 
+export const addMemberSchema = z
+  .object({
+    email: z.string().trim().email('Adresse courriel invalide').max(254),
+  })
+  .strict();
+
 export type CreateGroupInput = z.infer<typeof createGroupSchema>;
 export type UpdateGroupInput = z.infer<typeof updateGroupSchema>;
+export type AddMemberInput = z.infer<typeof addMemberSchema>;

@@ -5,7 +5,7 @@ import { conflict, forbidden, notFound } from '../../../shared/errors/app-error'
 import { sha256 } from '../../../shared/utils/hash';
 import { User } from '../../users/models/user.model';
 import { Group, type GroupDocument, type GroupRole } from '../models/group.model';
-import type { CreateGroupInput, UpdateGroupInput } from '../validators/group.validator';
+import type { AddMemberInput, CreateGroupInput, UpdateGroupInput } from '../validators/group.validator';
 
 interface MemberInfo {
   userId: string;
@@ -133,6 +133,33 @@ export class GroupService {
     group.members.pull({ userId: target.userId });
     await group.save();
     return { removed: true };
+  }
+
+  async addMember(groupId: string, actorId: string, input: AddMemberInput) {
+    const group = await findGroupOr404(groupId);
+    assertAdmin(group, actorId);
+
+    const email = input.email.toLowerCase();
+    const user = await User.findOne({ email }).select('_id displayName email').lean();
+    if (!user) {
+      throw notFound('Aucun utilisateur avec ce courriel', 'USER_NOT_FOUND');
+    }
+
+    const userId = user._id.toString();
+    if (findMembership(group, userId)) {
+      throw conflict('Cet utilisateur est déjà membre du groupe', 'ALREADY_MEMBER');
+    }
+
+    group.members.push({ userId: user._id, role: 'membre' });
+    await group.save();
+
+    return {
+      userId,
+      displayName: user.displayName,
+      email: user.email,
+      role: 'membre' as GroupRole,
+      joinedAt: group.members[group.members.length - 1].joinedAt,
+    };
   }
 
   async createInvitation(groupId: string, actorId: string) {

@@ -30,6 +30,10 @@ class GroupRepositoryImpl implements GroupRepository {
   Future<Group> acceptInvitation(String token) => _dataSource.acceptInvitation(token);
 
   @override
+  Future<GroupMember> addMember(String groupId, String email) =>
+      _dataSource.addMember(groupId, email);
+
+  @override
   Future<void> removeMember(String groupId, String userId) =>
       _dataSource.removeMember(groupId, userId);
 }

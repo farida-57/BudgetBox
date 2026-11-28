@@ -22,6 +22,9 @@ abstract class GroupRepository {
   /// Accepte une invitation via son jeton.
   Future<Group> acceptInvitation(String token);
 
+  /// Ajoute directement un membre par son courriel (admin uniquement).
+  Future<GroupMember> addMember(String groupId, String email);
+
   /// Retire un membre (admin uniquement).
   Future<void> removeMember(String groupId, String userId);
 }

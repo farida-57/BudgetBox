@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/group_invitation.dart';
+import '../../domain/entities/group_member.dart';
+import '../../domain/usecases/add_member_usecase.dart';
 import '../../domain/usecases/create_invitation_usecase.dart';
 import '../../domain/usecases/get_group_members_usecase.dart';
 import '../../domain/usecases/get_group_usecase.dart';
@@ -17,11 +19,13 @@ class GroupDetailCubit extends Cubit<GroupDetailState> {
     required GetGroupUseCase getGroupUseCase,
     required GetGroupMembersUseCase getGroupMembersUseCase,
     required CreateInvitationUseCase createInvitationUseCase,
+    required AddMemberUseCase addMemberUseCase,
     required RemoveMemberUseCase removeMemberUseCase,
   })  : _groupId = groupId,
         _getGroup = getGroupUseCase,
         _getMembers = getGroupMembersUseCase,
         _createInvitation = createInvitationUseCase,
+        _addMember = addMemberUseCase,
         _removeMember = removeMemberUseCase,
         super(const GroupDetailLoading());
 
@@ -29,6 +33,7 @@ class GroupDetailCubit extends Cubit<GroupDetailState> {
   final GetGroupUseCase _getGroup;
   final GetGroupMembersUseCase _getMembers;
   final CreateInvitationUseCase _createInvitation;
+  final AddMemberUseCase _addMember;
   final RemoveMemberUseCase _removeMember;
 
   Future<void> load() async {
@@ -43,6 +48,13 @@ class GroupDetailCubit extends Cubit<GroupDetailState> {
 
   /// Génère une nouvelle invitation à usage unique.
   Future<GroupInvitation> invite() => _createInvitation(_groupId);
+
+  /// Ajoute directement un membre par son courriel, puis recharge le détail.
+  Future<GroupMember> addMember(String email) async {
+    final member = await _addMember(_groupId, email);
+    await load();
+    return member;
+  }
 
   /// Retire un membre puis recharge le détail.
   Future<void> removeMember(String userId) async {

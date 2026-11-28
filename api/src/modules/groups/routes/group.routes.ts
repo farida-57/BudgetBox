@@ -4,6 +4,7 @@ import { requireAuth } from '../../../shared/auth/auth.middleware';
 import { validate } from '../../../shared/validation/zod';
 import { GroupController } from '../controllers/group.controller';
 import {
+  addMemberSchema,
   createGroupSchema,
   groupIdParamsSchema,
   invitationParamsSchema,
@@ -33,6 +34,12 @@ export function groupRoutes() {
     requireAuth,
     validate({ params: memberParamsSchema }),
     controller.removeMember,
+  );
+  router.post(
+    '/:groupId/members',
+    requireAuth,
+    validate({ params: groupIdParamsSchema, body: addMemberSchema }),
+    controller.addMember,
   );
   router.post(
     '/:groupId/invitations',
