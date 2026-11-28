@@ -11,6 +11,7 @@ import '../features/auth/presentation/bloc/auth_cubit.dart';
 import '../features/balances/domain/usecases/get_group_balances_usecase.dart';
 import '../features/balances/domain/usecases/get_settlement_suggestions_usecase.dart';
 import '../features/groups/domain/usecases/accept_invitation_usecase.dart';
+import '../features/groups/domain/usecases/add_member_usecase.dart';
 import '../features/groups/domain/usecases/create_group_usecase.dart';
 import '../features/groups/domain/usecases/create_invitation_usecase.dart';
 import '../features/groups/domain/usecases/get_group_members_usecase.dart';
@@ -44,6 +45,7 @@ class BudgetBoxApp extends StatelessWidget {
         RepositoryProvider<GetGroupMembersUseCase>.value(value: dependencies.getGroupMembersUseCase),
         RepositoryProvider<CreateInvitationUseCase>.value(value: dependencies.createInvitationUseCase),
         RepositoryProvider<AcceptInvitationUseCase>.value(value: dependencies.acceptInvitationUseCase),
+        RepositoryProvider<AddMemberUseCase>.value(value: dependencies.addMemberUseCase),
         RepositoryProvider<RemoveMemberUseCase>.value(value: dependencies.removeMemberUseCase),
         RepositoryProvider<GetGroupBalancesUseCase>.value(value: dependencies.getGroupBalancesUseCase),
         RepositoryProvider<GetSettlementSuggestionsUseCase>.value(
