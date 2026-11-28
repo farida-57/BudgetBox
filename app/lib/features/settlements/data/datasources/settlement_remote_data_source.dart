@@ -24,12 +24,12 @@ class SettlementApiDataSource implements SettlementRemoteDataSource {
       '/groups/${Uri.encodeComponent(groupId)}/activity',
       queryParameters: {
         'page': page, 'limit': 20,
-        if (memberId != null) 'memberId': memberId,
-        if (payerId != null) 'payerId': payerId,
-        if (category != null) 'category': category,
-        if (type != null) 'type': type,
-        if (from != null) 'from': from.toUtc().toIso8601String(),
-        if (to != null) 'to': to.toUtc().toIso8601String(),
+        'memberId': ?memberId,
+        'payerId': ?payerId,
+        'category': ?category,
+        'type': ?type,
+        'from': ?(from?.toUtc().toIso8601String()),
+        'to': ?(to?.toUtc().toIso8601String()),
       },
     );
     final data = response.data;
