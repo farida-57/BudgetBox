@@ -128,16 +128,29 @@ Failure mapDioException(DioException err) {
   final data = response.data;
   String? code;
   String? message;
+  final details = <String>[];
   if (data is Map<String, dynamic>) {
     final error = data['error'];
     if (error is Map<String, dynamic>) {
       code = error['code'] as String?;
       message = error['message'] as String?;
+      final rawDetails = error['details'];
+      if (rawDetails is List) {
+        for (final d in rawDetails) {
+          if (d is Map<String, dynamic> && d['message'] is String) {
+            details.add(d['message'] as String);
+          }
+        }
+      }
     }
   }
 
+  final fullMessage = details.isEmpty
+      ? (message ?? 'Erreur serveur (${response.statusCode})')
+      : '${message ?? 'Erreur serveur (${response.statusCode})'} : ${details.join(' ; ')}';
+
   return ServerFailure(
-    message ?? 'Erreur serveur (${response.statusCode})',
+    fullMessage,
     statusCode: response.statusCode,
     code: code,
   );
