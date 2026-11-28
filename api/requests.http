@@ -72,3 +72,18 @@ Authorization: Bearer {{accessToken}}
 ### Retirer un membre (admin)
 DELETE {{baseUrl}}/groups/{{groupId}}/members/{{userId}}
 Authorization: Bearer {{accessToken}}
+
+### === Soldes (calculés par le serveur, lecture seule) ===
+
+### Soldes nets du groupe (membre)
+# 200 → { "groupId", "currency": "XOF",
+#         "balances": [{ "userId", "displayName", "balance": 6666, "isMember": true }] }
+# balance > 0 : le groupe doit cette somme à la personne ; < 0 : elle doit au groupe.
+GET {{baseUrl}}/groups/{{groupId}}/balances
+Authorization: Bearer {{accessToken}}
+
+### Suggestions de règlement (membre) — n'enregistre aucun règlement
+# 200 → { "groupId", "currency": "XOF",
+#         "suggestions": [{ "fromUserId", "fromDisplayName", "toUserId", "toDisplayName", "amount": 3333 }] }
+GET {{baseUrl}}/groups/{{groupId}}/settlement-suggestions
+Authorization: Bearer {{accessToken}}
